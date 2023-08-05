@@ -1,0 +1,21 @@
+#!/bin/sh
+
+# Link style.css to every subdirectory in this folder.
+subdirmake="$PWD/dir-make"
+[ -e "$subdirmake" ] || exit 1
+
+# NOTE: *only* run this script from the website root.
+find . -type d |
+    grep -v './\.' |
+    grep -v '^.$' |
+    grep -v 'assets' |
+    xargs -I{} echo "{}/make" |
+    while read -r makef; do
+        # Make sure we get the right depth for the parent css file.
+        subdirmake="$(echo $makef | sed "s~^./~~" | sed -E "s~[a-z]+/~../~g")"
+        subdirmake="$(echo $subdirmake | sed "s/make/dir-make/")"
+        if [ -h "$makef" ]; then
+            rm -- "$makef"
+        fi
+        ln -s "$subdirmake" "$makef"
+    done

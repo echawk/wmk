@@ -1,0 +1,52 @@
+#!/bin/sh -e
+
+md2html() {
+    grep -v '^:' "$1" |
+        lowdown -M css:./style.css -s -Thtml > "$2"
+}
+
+tex2html() {
+    base="$(echo "$1" | cut -d'.' -f1)"
+    make4ht -x "$1" > /dev/null
+    sed "s/$base.css/style.css/" "$base.html" > _
+    mv -f _ "$base.html"
+    find . -type f -name "$base*" |
+        grep -vE "(tex|html)" |
+        xargs rm
+}
+
+org2html() {
+    emacs --batch --eval "(require 'org)" \
+        "$1" --funcall org-html-export-to-html
+}
+
+case "$1" in
+    clean)
+        if ls | grep -E -q '.html$'; then
+            rm -v -- *.html
+        fi
+        ;;
+    *)
+        if ls | grep -E -q ".tex$"; then
+            for a in *.tex; do
+                tex2html "$a"
+            done
+        fi
+        if ls | grep -E -q ".org$"; then
+            for a in *.org; do
+                org2html "$a"
+            done
+        fi
+        if ls | grep -v about.md | grep -E -q '.md'; then
+            for a in *.md; do
+                case "$a" in
+                    about.md) ;;
+                    *)
+                        base=$(echo "$a" | cut -d'.' -f1)
+                        md2html "$a" "$base.html"
+                        ;;
+                esac
+            done
+        fi
+        ;;
+esac

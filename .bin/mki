@@ -1,0 +1,12 @@
+#!/bin/sh
+
+cat <<EOF
+<h1>Welcome to $FULLNAME's personal website.</h1>
+EOF
+for d in */; do
+    echo $d
+done \
+    | tr -d '/' \
+    | awk '{print "<a href=\"" $1 ".html\">" $1 "</a>"}'
+
+lowdown -s -Thtml -M css:./style.css < about.md

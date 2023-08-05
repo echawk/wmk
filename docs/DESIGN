@@ -1,0 +1,54 @@
+This document will provide a high level overview of my website
+management situation, should you want to use this sytem yourself.
+
+The key idea behind this system is portability. It doesn't require
+any gigantic dependencies, just simple C programs and shell scripts.
+(NOTE: You can also depend on LaTeX, which admittedly isn't simple or small.)
+
+Additionally, the main make script also allows you to export your
+site as a tarball for easy distribution on different computers -
+in addition to serving as an easy method of backing up the site.
+
+The supported formats for site files are:
+* Markdown
+* LaTeX
+* ORG (todo) but this will be used for programming style blog entries
+  (orrr I could just use marktex.................)
+
+Plain text isn't supported.
+
+I am considering moving the markdown generator to use my homegrown
+`marktex' but I haven't touched that project in about a year so I'm
+not familiar with it's edge cases anymore. That should be relatively
+straightforward to do though.
+
+NOTE: I may also just rewrite marktex to use a different language
+altogether, however there are few languages as convient as shell for the
+use case.
+
+The general layout is as follows:
+
+.
+├── about.md
+├── dir-make
+├── make
+├── subdir1
+│   ├── about.md
+│   └── article-topic.md
+├── subdir2
+│   ├── about.md
+│   └── article-topic2.tex
+└── style.css
+
+To build the website, run `./make' in the root of the site.
+This will automatically link up the style.css files as well as the
+`make' scripts that are used to compile the md and latex files into
+html.
+
+The Index page and Home pages for each subdirectory are automatically generated.
+Each subdirectory **must** have an about.md file in it -- it can be empty if
+you'd like.
+
+Nearly all of your visual configuration will be done in style.css
+
+TODO: need to support the loading of assets. - Done

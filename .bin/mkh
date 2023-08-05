@@ -1,0 +1,36 @@
+#!/bin/sh -e
+
+# Make a 'home page' for a subdirectory of the site.
+
+# Will contain links to all of the articles (plus dates etc).
+
+# Take a directory's contents and an about.md and make a browsable site.
+# Similarly to `mki', however, each of these sites will allow you to go
+# back to the home page.
+
+dir="$1"
+[ -d "$dir" ] || exit 1
+[ -e "$dir/about.md" ] || exit 1
+
+# Create the start of the page with the little about section.
+html_files="$(find "$dir" -name '*.html')"
+lowdown -s -Thtml -M css:./style.css < "$dir/about.md"
+
+# Next, Create all of the links.
+# TODO: make the names prettier via info that I give int the markdown file.
+echo '<h2 id="links">Links</h2>'
+for html_f in $html_files; do
+    base="$(echo $html_f | cut -d'.' -f1)"
+    if grep -q ':TITLE' "$base.md"; then
+        title="$(grep ':TITLE' "$base.md" | cut -d' ' -f2-)"
+    else
+        title="$base"
+    fi
+    if grep -q ':DATE' "$base.md"; then
+        article_date="$(grep ':DATE' "$base.md" | cut -d' ' -f2-)"
+    else
+        #article_date="$(date +%m-%d-%Y)"
+        article_date="Current Year"
+    fi
+    printf '<p>%s -- <a href="%s">%s</a></p>\n' "$article_date" "$html_f" "$title"
+done | sort | tac

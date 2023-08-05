@@ -1,0 +1,21 @@
+#!/bin/sh
+
+# Link style.css to every subdirectory in this folder.
+sitecss="$PWD/style.css"
+# Just check to make sure our style.css actually exists.
+[ -e "$sitecss" ] || exit 1
+
+# NOTE: *only* run this script from the website root.
+find . -type d |
+    grep -v './\.' |
+    grep -v '^.$' |
+    grep -v 'assets' |
+    xargs -I{} echo "{}/style.css" |
+    while read -r cssfile; do
+        # Make sure we get the right depth for the parent css file.
+        sitecss="$(echo $cssfile | sed "s~^./~~" | sed -E "s~[a-z]+/~../~g")"
+        if [ -h "$cssfile" ]; then
+            rm -- "$cssfile"
+        fi
+        ln -s "$sitecss" "$cssfile"
+    done
