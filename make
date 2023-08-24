@@ -21,7 +21,8 @@ case $1 in
         find . -name '*.html' >> "$tarfiles"
         find . -name '*.css' >> "$tarfiles"
         find . -type f | grep assets >> "$tarfiles"
-        tar cvf - $(cat "$tarfiles") | xz > site.tar.xz
+        # The grep is to remove any hidden directories.
+        tar cvf - $(grep -v '/\..*/' "$tarfiles") | xz > site.tar.xz
         rm -v -- "$tarfiles"
         ;;
     host)
