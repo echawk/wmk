@@ -28,6 +28,9 @@ case $1 in
     host)
         darkhttpd .
         ;;
+    watch)
+        find . -type f | grep -v "./\." | entr -s './make'
+        ;;
     *)
         ./.bin/setupmake
         ./.bin/setupcss
